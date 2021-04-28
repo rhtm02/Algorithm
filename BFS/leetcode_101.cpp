@@ -10,55 +10,37 @@
  * };
  */
 #include <queue>
-#include <vector>
-#include <set>
+
 using namespace std;
 class Solution {
 public:
     bool isSymmetric(TreeNode* root) {
+        queue<TreeNode*> q;
+        TreeNode* leftSide;
+        TreeNode* rightSide;
         
-        vector<int> bfsList;
+        q.push(root);
+        q.push(root);
         
-        bfsList = BFS(root);
-        printVector(bfsList);
+        while(!q.empty())
+        {
 
-     
+            leftSide = q.front();
+            q.pop();
+            rightSide = q.front();
+            q.pop();
+            
+            if ((leftSide == nullptr) ^ (rightSide == nullptr)) return false;
+            else if((leftSide == nullptr) && (rightSide == nullptr)) continue;
+            if(leftSide->val != rightSide->val) return false;
+            
+            q.push(leftSide->right);
+            q.push(rightSide->left);
+            
+            q.push(leftSide->left);
+            q.push(rightSide->right);
+        }
+        
         return true;  
     }    
-    
-    vector<int> BFS(TreeNode* &inputs)
-    {
-        vector<int> output;
-        queue<TreeNode*> searchList;
-        
-        searchList.push(inputs->left);
-        searchList.push(inputs->right);
-        output.push_back(inputs->val);
-        TreeNode* temp;
-        //BFS
-        while(!searchList.empty())
-        {
-            temp = searchList.front();
-            searchList.pop();
-            output.push_back(temp->val);
-            if(temp->left != nullptr) searchList.push(temp->left);
-            if(temp->right != nullptr) searchList.push(temp->right);
-        }
-        
-        return output;
-    }
-    
-    bool Symmetric(vector<int> &inputs)
-    {
-
-        return true;
-    }
-    
-    void printVector(vector<int> &inputs)
-    {
-        for(auto it: inputs)
-        {
-            cout<<it<<endl;
-        }
-    }
 };
