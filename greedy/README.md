@@ -1,3 +1,3 @@
 Greedy Algorithm 
 =================
-> Fail : 1754
+> Fail : 1754, 1818
