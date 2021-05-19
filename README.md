@@ -1,4 +1,4 @@
-자료구조 공부
+Algorithm Repo
 =================================
 >## leetcode problems
 >## BAEKJOON problems
