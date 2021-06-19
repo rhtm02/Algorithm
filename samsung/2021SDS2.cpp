@@ -40,9 +40,16 @@ int main() {
                 auto temp = prev(it);
                 if (abs(gap - *it) > abs(gap - *temp)) it = temp;
             }
-            if(gap > 0) gap += (-*it);
-            else gap += (*it);
-            ans++;
+            if(gap < *it)
+            {
+                if(gap > 0) gap += (-*it);
+                else gap += (*it);
+                ans++;
+                continue;
+            }
+
+            ans += (gap / (*it));
+            gap %= *it;
         }
         cout << '#' << i + 1 << ' ' << ans << '\n';
     }
