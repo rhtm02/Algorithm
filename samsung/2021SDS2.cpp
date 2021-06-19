@@ -15,9 +15,7 @@ int main() {
         cin >> src; cin >> dest; cin >> len;
         cin >> filter; string revFilter(filter.rbegin(),filter.rend());
         int filterInt = 0; int revFilterInt = 0;
-        int gap = 0;
-        if(dest < src) gap = dest - src;
-        else gap = src - dest;
+        int gap = abs(src - dest);
         int srcSize = 0; set<int> filters;int ans = 0;
         while(src > 0) {srcSize++; src /= 10;}
         for(int idx = 0;idx < len;idx++)
@@ -27,22 +25,23 @@ int main() {
             if(revFilter[idx] == '+') revFilterInt += pow(10,len - 1 -idx);
             else if(revFilter[idx] == '-') revFilterInt += (-pow(10,len - 1 -idx));
         }
-        if((gap % filterInt) != 0) {cout << '#' << i + 1 << " -1\n"; continue;}
+        int check = min(abs(revFilterInt),abs(filterInt));
+        if((gap % check) != 0) {cout << '#' << i + 1 << " -1\n"; continue;}
         for(int i = 0;i <= (srcSize - len);i++)
         {
             int temp = pow(10,i);
-            filters.insert(temp * filterInt);
-            filters.insert(temp * revFilterInt);
+            filters.insert(abs(temp * filterInt));
+            filters.insert(abs(temp * revFilterInt));
         }
-
         while(gap != 0)
         {
             auto it = filters.lower_bound(gap);
-            if(it != prev(filters.end())) {
-                auto temp = next(it);
+            if(it != filters.begin()) {
+                auto temp = prev(it);
                 if (abs(gap - *it) > abs(gap - *temp)) it = temp;
             }
-            gap += (-*it);
+            if(gap > 0) gap += (-*it);
+            else gap += (*it);
             ans++;
         }
         cout << '#' << i + 1 << ' ' << ans << '\n';
