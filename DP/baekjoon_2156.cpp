@@ -1,21 +1,26 @@
 #include <iostream>
+#include <vector>
+
 using namespace std;
-long long val[10001] = {0,};
-long long dp[10001] = { 0, };
-
 int main() {
-	int N;
-	cin >> N;
-	for (int i = 1; i <= N; i++) cin >> val[i];
-	
-	dp[1] = val[1];
-	dp[2] = val[1] + val[2];
+    ios_base :: sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int N;
+    cin >> N;
+    vector<int> values(N + 1);
+    for(int i = 1;i <= N;i++) cin >> values[i];
 
-	for (int idx = 3; idx <= N; idx++)
-	{	
-		dp[idx] = max(dp[idx - 1], dp[idx - 2] + val[idx]);
-		dp[idx] = max(dp[idx - 3] + val[idx - 1] + val[idx], dp[idx]);
-	}
-	cout << dp[N];
-	
+    vector<int> DP(N + 1);
+    DP[1] = values[1];
+    DP[2] = values[2] + values[1];
+    DP[3] = max(values[1] + values[3],values[2] + values[3]);
+    DP[3] = max(DP[3],values[1] + values[2]);
+    for(int i = 4;i <= N;i++)
+    {
+        DP[i] = max(DP[i - 1],DP[i - 2] + values[i]);
+        DP[i] = max(DP[i],DP[i - 3] + values[i] + values[i - 1]);
+    }
+
+    cout << DP[N];
 }
