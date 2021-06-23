@@ -1,43 +1,33 @@
 #include <iostream>
-#include <algorithm>
+#include <vector>
 
 using namespace std;
-
-int st[2][100001] = { 0 };
-int dp[2][100001] = { 0 };
-
-int main()
-{
-	int t;
-	int n;
-	int max = 0;
-
-	cin >> t;
-
-	for(int i=1; i<=t; i++)
-	{
-		cin >> n;
-
-		for (int i = 0; i < n; i++)
-			cin >> st[0][i];
-
-		for (int i = 0; i < n; i++)
-			cin >> st[1][i];
-
-		dp[0][0] = st[0][0];
-		dp[1][0] = st[1][0];
-		dp[0][1] = st[0][1] + dp[1][0];
-		dp[1][1] = st[1][1] + dp[0][0];
-
-		for (int i = 2; i < n; i++)
-		{
-			dp[0][i] = st[0][i] + std::max(dp[1][i - 1], dp[1][i - 2]);
-			dp[1][i] = st[1][i] + std::max(dp[0][i - 1], dp[0][i - 2]);
-		}
-
-
-		cout << std::max(dp[0][n - 1], dp[1][n - 1])<<endl;
-
-	}
-
+int main() {
+    ios_base :: sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int T;int N;
+    cin >> T;
+    for(int i = 0;i < T;i++)
+    {
+        cin >> N;
+        vector<int> row1(N + 1);
+        vector<int> row2(N + 1);
+        vector<int> DP1(N + 1);
+        vector<int> DP2(N + 1);
+        for(int j = 1;j <= N;j++) cin >> row1[j];
+        for(int j = 1;j <= N;j++) cin >> row2[j];
+        DP1[1] = row1[1];
+        DP2[1] = row2[1];
+        DP2[2] = DP1[1] + row2[2];
+        DP1[2] = DP2[1] + row1[2];
+        for(int idx = 3;idx <= N;idx++)
+        {
+            DP1[idx] = max(DP2[idx - 1] + row1[idx],DP1[idx - 2] + row1[idx]);
+            DP1[idx] = max(DP1[idx],DP2[idx - 2] + row1[idx]);
+            DP2[idx] = max(DP1[idx - 1] + row2[idx],DP2[idx - 2] + row2[idx]);
+            DP2[idx] = max(DP2[idx],DP1[idx - 2] + row2[idx]);
+        }
+        cout << max(DP1[N],DP2[N]) << '\n';
+    }
 }
