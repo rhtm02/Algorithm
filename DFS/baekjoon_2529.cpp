@@ -1,43 +1,60 @@
 #include <iostream>
-#include <string>
+#include <vector>
+#include <algorithm>
+#include <map>
+
 using namespace std;
 
-int n; // 부등호 갯수
-char b[9];
-bool c[10] = { false, };
-string mn, mx;
+vector<char> inputs;
+map<int,bool> node_check;
+vector<string> ans;
+int K;
 
-bool possible(int i, int j, char k) {
-    if (k == '<')return i < j;
-    if (k == '>')return i > j;
-    return true;
-}
 
-void solve(int cnt, string s){
-    if (cnt == n + 1) {
-        if (!mn.size()) {
-            mn = s;
-        }
-        else mx = s;
+
+void recursive(int k,string s){
+    if(k == K){
+        ans.push_back(s);
         return;
     }
-    for (int i = 0; i < 10; i++) {
-        if (c[i]) continue;
-        if (cnt == 0 || possible(s[cnt - 1], i+'0', b[cnt - 1])) {
-            c[i] = true;
-            solve(cnt+1, s+to_string(i));
-            c[i] = false;
+
+    for(int i = 0;i < 10;i++){
+        if(node_check[i] == true) continue;
+        node_check[i] = true;
+        if(s.empty()) recursive(k,s + to_string(i));
+        else{
+            if(inputs[k] == '>'){
+                if((s.back() - '0') > i) recursive(k + 1,s + to_string(i));
+            }
+            else{
+                if((s.back() - '0') < i) recursive(k + 1,s + to_string(i));
+            }
         }
+        node_check[i] = false;
     }
+
+
+
 }
 
 int main() {
-    cin >> n;
-    for (int i = 0; i < n; i++) {
-        cin >> b[i];
+    cin.tie(NULL); cout.tie(NULL); ios::sync_with_stdio(false);
+    cin >> K;
+
+    for(int i = 0;i < K;i++){
+        char temp;
+        cin >> temp;
+        inputs.push_back(temp);
     }
-    solve(0, "");
-    cout << mx << '\n';
-    cout << mn << '\n';
+
+    for(int i = 0;i < 10;i++) node_check[i] = false;
+
+    recursive(0,"");
+
+    cout << ans.back() <<'\n';
+    cout << ans[0] <<'\n';
+
+
+
     return 0;
 }
