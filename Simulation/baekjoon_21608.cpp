@@ -4,111 +4,97 @@
 #include <queue>
 #include <map>
 #include <utility>
-#include <bitset>
+#include<set>
 using namespace std;
 
-
 int N;
-vector<vector<int>> matrix;
-vector<pair<int, int>> coord;
-vector<pair<int, vector<int>>> lst;
+vector<vector<int>> class_room;
+vector<int> order;
+map<int, vector<int>> student_table;
 
-vector<pair<int, int>> moves = { {-1,0},{1,0},{0,-1},{0,1} };
+vector<pair<int, int>> moves = { {-1,0},{1,0},{0,1},{0,-1} };
 
-bool compare(vector<int> a, vector<int> b) {
-	if (a[0] > b[0]) return a > b;
-	if (a[0] == b[0] && a[1] >= b[1]) return a > b;
-	if (a[0] == b[0] && a[1] == b[1] && a[2] < b[2]) return a > b;
-	if (a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] < b[3]) return a > b;
+
+bool compare(vector<int> a = {0,0,0,0}, vector<int> b = { 0,0,0,0 }) {
+    if (a[0] > b[0]) return true;
+    else if (a[0] == b[0] && a[1] > b[1]) return true;
+    else if (a[0] == b[0] && a[1] == b[1] && a[2] < b[2]) return true;
+    else if (a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] < b[3]) return true;
+    else return false;
+        
 }
 
+
 int main() {
-	cin.tie(NULL); cout.tie(NULL); ios::sync_with_stdio(false);
-	
-	cin >> N;
+    cin.tie(NULL); cout.tie(NULL); ios::sync_with_stdio(false);
+    cin >> N;
 
-	for (int i = 0; i < N*N; i++) {
-		int student;
-		int f;
-		cin >> student;
+    for (int r = 0; r < N; r++) {
+        vector<int> row;
+        row.resize(N);
+        class_room.push_back(row);
+    }
 
-		vector<int> temp;
-		for (int j = 0; j < 4; j++) {
-			cin >> f;
-			temp.push_back(f);
-		}
-		lst.push_back(pair<int, vector<int>>(student, temp));
-	}
-	
-	for (int i = 0; i < N; i++) {
-		vector<int> temp;
-		for (int j = 0; j < N; j++) temp.push_back(0);
-		matrix.push_back(temp);
-	}
+    for (int i = 0; i < N*N; i++) {
+        int s = 0; 
+        cin >> s;
+        for (int j = 0; j < 4; j++) {
+            int f = 0;
+            cin >> f;
+            student_table[s].push_back(f);
+        }
+        order.push_back(s);
+    }
+    
 
-	for (auto it : lst) {
-		int student = it.first;
+    for (auto student : order) {
+        vector<vector<int>> factors;
+        for (int row = 0; row < N; row++) {
+            for (int col = 0; col < N; col++) {
+                if (class_room[row][col] != 0) continue;
+                int num_friends = 0;
+                int num_empty = 0;
+                for (auto m : moves) {
+                    int r = row + m.first;
+                    int c = col + m.second;
+                    if (r < 0 || r >= N || c < 0 || c >= N) continue;
+                    for (auto f : student_table[student]) {
+                        if (class_room[r][c] == f) num_friends++;
+                        if (class_room[r][c] == 0) num_empty++;
+                    }
+                }
+                factors.push_back({ num_friends,num_empty,row,col });
+            }
+        }
+        
+        sort(factors.begin(), factors.end(), compare);
+        class_room[factors[0][2]][factors[0][3]] = student;
+    }
 
-		
-		int max_empty = 0; int max_friends = 0;
 
-		vector<vector<int>> temp;
-		for (int x = 0; x < N; x++) {
-			for (int y = 0; y < N; y++) {
-				
-				vector<int> temp2;
 
-				int empty = 0;
-				int friends = 0;
-				
-				if (matrix[x][y] != 0) continue;
-				
-				for (auto m : moves) {
-					int m_x = x + m.first;
-					int m_y = y + m.second;
+    int ans = 0;
 
-					if (m_x < 0 || m_x >= N || m_y < 0 || m_y >= N) continue;
-					if (matrix[m_x][m_y] == 0) empty++;
+    for (int row = 0; row < N; row++) {
+        for (int col = 0; col < N; col++) {
+            int num_friends = 0;
+            for (auto m : moves) {
+                int r = row + m.first;
+                int c = col + m.second;
+                if (r < 0 || r >= N || c < 0 || c >= N) continue;
+                for (auto f : student_table[class_room[row][col]]) {
+                    if (class_room[r][c] == f) num_friends++;
+                }
+            }
 
-					for (auto f : it.second) {
-						if (matrix[m_x][m_y] == f) friends++;
-					}
+            if (num_friends == 0) ans += 0;
+            else if (num_friends == 1) ans += 1;
+            else if (num_friends == 2) ans += 10;
+            else if (num_friends == 3) ans += 100;
+            else ans += 1000;
+        }
+    }
 
-				}
-				temp.push_back({ friends, empty, x, y });
-			}
-		}
-		sort(temp.begin(), temp.end(), compare);
-		int set_x = temp[0][2]; int set_y = temp[0][3];
-		matrix[set_x][set_y] = student;
-		coord.push_back(pair<int,int>(set_x, set_y));
-	}
+    cout << ans;
 
-	int score = 0;
-
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			int idx = N * i + j;
-			int cnt = 0;
-			for (auto m : moves) {
-				int m_x = m.first + coord[idx].first;
-				int m_y = m.second + coord[idx].second;
-				if (m_x < 0 || m_x >= N || m_y < 0 || m_y >= N) continue;
-
-				for (auto it : lst[idx].second) {
-					if (it == matrix[m_x][m_y]) cnt++;
-				}
-			}
-
-			if (cnt == 0) score += 0;
-			else if (cnt == 1) score += 1;
-			else if (cnt == 2) score += 10;
-			else if (cnt == 3) score += 100;
-			else score += 1000;
-		}
-	}
-	
-	cout << score;
-
-	return 0;
 }
