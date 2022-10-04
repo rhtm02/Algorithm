@@ -31,10 +31,13 @@ bool explore() {
 		int r = 1;
 
 		int temp_bridge[31][11] = { {0,} };
+		/*
 		for (int r = 1; r <= H; r++) {
 			for (int c = 1; c <= N; c++) temp_bridge[r][c] = bridge[r][c];
 		}
-			
+		*/
+		copy(&bridge[0][0],&bridge[0][0] + 31*11,&temp_bridge[0][0]);
+
 		while (r <= H) {
 			//cout << r << '-' << c << '\n';
 			// left
